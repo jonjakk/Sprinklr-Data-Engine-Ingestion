@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  sftp_server:
+    image: atmoz/sftp
+    ports:
+      - "2222:22"
+    volumes:
+      - ./sftpuser/upload:/home/exampleuser/upload
+    command: exampleuser:examplepassword:1001:1001
+    environment:
+      SFTP_USERS: "exampleuser:examplepassword:1001"
+    restart: always
+
+  python-api:
+    build: ./python
+    environment:
+      SFTP_USERNAME: exampleuser
+      SFTP_PASSWORD: examplepassword
+      SFTP_SERVER: 127.0.0.1
+      API_KEY: replace_me
+      BEARER_TOKEN: replace_me
+      SPRINKLR_API_URL: https://api2.sprinklr.com/prod3/api/v2/reports/query
+      FILE_NAME: api-usage-hourly.csv
+      SFTP_PORT: 2222
+    depends_on:
+      - sftp_server
